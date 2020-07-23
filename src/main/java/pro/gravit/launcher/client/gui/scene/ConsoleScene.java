@@ -44,6 +44,8 @@ public class ConsoleScene extends AbstractScene {
         commandLine.setOnAction(this::send);
         LookupHelper.<ButtonBase>lookup(layout, "#send").setOnAction(this::send);
         LookupHelper.<Labeled>lookup(layout, "#version").setText(getMiniLauncherInfo());
+        LookupHelper.<Labeled>lookup(layout, "#version").setManaged(false);
+        LookupHelper.<Labeled>lookup(layout, "#version").setVisible(false);
     }
 
     @Override

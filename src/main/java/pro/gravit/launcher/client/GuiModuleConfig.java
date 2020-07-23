@@ -9,6 +9,12 @@ public class GuiModuleConfig {
     public String forgotPassURL;
     @LauncherInject(value = "modules.javaruntime.hastebinserver")
     public String hastebinServer;
+    @LauncherInject(value = "modules.javaruntime.site")
+    public String site;
+    @LauncherInject(value = "modules.javaruntime.vk")
+    public String vk;
+    @LauncherInject(value = "modules.javaruntime.discord")
+    public String discord;
     @LauncherInject(value = "modules.javaruntime.enabledownloadjava")
     public boolean enableDownloadJava;
     @LauncherInject(value = "modules.javaruntime.userdisabledownloadjava")
@@ -20,9 +26,12 @@ public class GuiModuleConfig {
 
     public static Object getDefault() {
         GuiModuleConfig config = new GuiModuleConfig();
-        config.createAccountURL = "https://gravit.pro/createAccount.php";
-        config.forgotPassURL = "https://gravit.pro/fogotPass.php";
+        config.createAccountURL = "https://politcubes.ru/#account";
+        config.forgotPassURL = "https://politcubes.ru/#account";
         config.hastebinServer = "https://hasteb.in";
+        config.vk = "https://vk.com/politcubes";
+        config.discord = "https://discordapp.com/invite/7CAbCcQ";
+        config.site = "https://politcubes.ru/";
         config.enableDownloadJava = false;
         config.userDisableDownloadJava = true;
         config.jvmWindows64Dir = "java-windows-x64";

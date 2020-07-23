@@ -42,22 +42,40 @@ public class LoginScene extends AbstractScene {
             loginField.setText(application.runtimeSettings.login);
         passwordField = LookupHelper.lookup(layout, "#password");
         savePasswordCheckBox = LookupHelper.lookup(layout, "#savePassword");
+        savePasswordCheckBox.isSelected();
+        savePasswordCheckBox.setIndeterminate(false);
+        savePasswordCheckBox.setSelected(true);
+        savePasswordCheckBox.setVisible(false);
+        savePasswordCheckBox.setManaged(false);
         if (application.runtimeSettings.encryptedPassword != null) {
             passwordField.getStyleClass().add("hasSaved");
             passwordField.setPromptText(application.getTranslation("runtime.scenes.login.login.password.saved"));
             LookupHelper.<CheckBox>lookup(layout, "#savePassword").setSelected(true);
         }
         autoenter = LookupHelper.<CheckBox>lookup(layout, "#autoenter");
-        autoenter.setSelected(application.runtimeSettings.autoAuth);
         autoenter.setOnAction((event) -> application.runtimeSettings.autoAuth = autoenter.isSelected());
+        autoenter.setVisible(false);
+        autoenter.setManaged(false);
         if (application.guiModuleConfig.createAccountURL != null)
             LookupHelper.<Hyperlink>lookup(layout, "#createAccount").setOnAction((e) ->
                     application.openURL(application.guiModuleConfig.createAccountURL));
+        if (application.guiModuleConfig.site != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#site").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.site));
+        if (application.guiModuleConfig.discord != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#discord").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.discord));
+        if (application.guiModuleConfig.vk != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#vk").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.vk));
         if (application.guiModuleConfig.forgotPassURL != null)
             LookupHelper.<Hyperlink>lookup(layout, "#forgotPass").setOnAction((e) ->
                     application.openURL(application.guiModuleConfig.forgotPassURL));
         authList = LookupHelper.lookup(layout, "#combologin");
         authList.setConverter(new AuthConverter());
+        authList.hide();
+        authList.setVisible(false);
+        authList.setManaged(false);
         LookupHelper.<ButtonBase>lookup(layout, "#goAuth").setOnAction((e) -> contextHelper.runCallback(this::loginWithGui).run());
         // Verify Launcher
         {

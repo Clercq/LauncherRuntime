@@ -15,6 +15,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.ClientLauncherProcess;
@@ -53,6 +55,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+
+
+
+
+
 
 public class ServerMenuScene extends AbstractScene {
     private static final String SERVER_BUTTON_FXML = "components/serverButton.fxml";
@@ -110,24 +117,29 @@ public class ServerMenuScene extends AbstractScene {
         layout = LookupHelper.lookup(scene.getRoot(), "#layout", "#serverMenu");
         sceneBaseInit(layout);
         avatar = LookupHelper.lookup(layout, "#avatar");
+        avatar.setVisible(false);
+        avatar.setManaged(false);
         serverImage = LookupHelper.lookup(layout, "#serverImage");
+        serverImage.setVisible(false);
+        serverImage.setManaged(false);
         originalAvatarImage = avatar.getImage();
         originalServerImage = serverImage.getImage();
 
-        LookupHelper.<ButtonBase>lookup(layout, "#clientSettings").setOnAction((e) -> {
-            try {
-                if (application.runtimeStateMachine.getProfile() == null)
-                    return;
-                showOverlay(application.gui.optionsOverlay, (ec) -> {
-                    application.gui.optionsOverlay.addProfileOptionals(application.runtimeStateMachine.getProfile());
-                });
-            } catch (Exception ex) {
-                LogHelper.error(ex);
-            }
-        });
+        if (application.guiModuleConfig.site != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#site").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.site));
+        if (application.guiModuleConfig.discord != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#discord").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.discord));
+        if (application.guiModuleConfig.vk != null)
+            LookupHelper.<Hyperlink>lookup(layout, "#vk").setOnAction((e) ->
+                    application.openURL(application.guiModuleConfig.vk));
+
         LookupHelper.<ButtonBase>lookup(layout, "#settings").setOnAction((e) -> {
             showOverlay(application.gui.settingsOverlay, null);
         });
+
+
         LookupHelper.<ButtonBase>lookup(layout, "#exit").setOnAction((e) ->
                 application.messageManager.showApplyDialog(application.getTranslation("runtime.overlay.settings.exitDialog.header"),
                         application.getTranslation("runtime.overlay.settings.exitDialog.description"), () ->
@@ -150,6 +162,53 @@ public class ServerMenuScene extends AbstractScene {
 
                                         }), () -> {
                         }, true));
+        WebView browser = new WebView();
+
+        WebEngine webEngine = browser.getEngine();
+        browser.setLayoutX(175);
+        browser.setLayoutY(30);
+        browser.setPrefHeight(425);
+        browser.setPrefWidth(725);
+        browser.setVisible(false);
+        browser.setManaged(false);
+
+        WebView browserNews = new WebView();
+        WebEngine webEngineNews = browserNews.getEngine();
+        browserNews.setLayoutX(175);
+        browserNews.setLayoutY(30);
+        browserNews.setPrefHeight(425);
+        browserNews.setPrefWidth(725);
+        webEngineNews.load("https://politcubes.ru/news.html");
+        webEngine.load("https://map.politcubes.ru/index.html");
+
+        LookupHelper.<Pane>lookup(scene.getRoot(), "#serverMenu").getChildren().add(browser);
+        LookupHelper.<Pane>lookup(scene.getRoot(), "#serverMenu").getChildren().add(browserNews);
+
+        LookupHelper.<ButtonBase>lookup(layout, "#map").setOnAction((e) -> {
+            browser.setVisible(true);
+            browser.setManaged(true);
+            browserNews.setManaged(false);
+            browserNews.setVisible(false);
+        });
+        LookupHelper.<ButtonBase>lookup(layout, "#mainbtn").setOnAction((e) -> {
+            browserNews.setVisible(true);
+            browserNews.setManaged(true);
+            browser.setManaged(false);
+            browser.setVisible(false);
+        });
+
+        LookupHelper.<ButtonBase>lookup(layout, "#mods").setOnAction((e) -> {
+            try {
+                if (application.runtimeStateMachine.getProfile() == null)
+                    return;
+                showOverlay(application.gui.optionsOverlay, (ec) -> {
+                    application.gui.optionsOverlay.addProfileOptionals(application.runtimeStateMachine.getProfile());
+                });
+            } catch (Exception ex) {
+                LogHelper.error(ex);
+            }
+        });
+
         LookupHelper.<ButtonBase>lookup(layout, "#clientLaunch").setOnAction((e) -> launchClient());
         reset();
     }
@@ -177,6 +236,8 @@ public class ServerMenuScene extends AbstractScene {
         lastProfiles = application.runtimeStateMachine.getProfiles();
         Map<ClientProfile, ServerButtonCache> serverButtonCacheMap = new LinkedHashMap<>();
         LookupHelper.<Labeled>lookup(layout, "#nickname").setText(application.runtimeStateMachine.getUsername());
+        LookupHelper.<Labeled>lookup(layout, "#nickname").setVisible(false);
+        LookupHelper.<Labeled>lookup(layout, "#nickname").setManaged(false);
         avatar.setImage(originalAvatarImage);
         try {
             int position = 0;
@@ -212,6 +273,8 @@ public class ServerMenuScene extends AbstractScene {
 
         Pane serverList = (Pane) LookupHelper.<ScrollPane>lookup(layout, "#serverlist").getContent();
         serverList.getChildren().clear();
+        serverList.setVisible(false);
+        serverList.setManaged(false);
         serverButtonCacheMap.forEach((profile, serverButtonCache) -> {
             try {
                 Pane pane = serverButtonCache.pane.get();
@@ -323,6 +386,8 @@ public class ServerMenuScene extends AbstractScene {
         LookupHelper.<Text>lookup(LookupHelper.
                         <ScrollPane>lookup(layout, "#serverInfo").getContent(),
                 "#servertext").setText(profile.getInfo());
+
+
         if (pingerResult != null)
             LookupHelper.<Text>lookup(layout, "#headingOnline").setText(String.format("%d / %d", pingerResult.onlinePlayers, pingerResult.maxPlayers));
         else
